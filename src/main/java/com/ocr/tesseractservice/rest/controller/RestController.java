@@ -18,61 +18,21 @@ import net.sourceforge.tess4j.TesseractException;
 
 @Controller
 public class RestController {
-	 private Object storageService;
 
-
-	    public RestController() {
+		public RestController() {
 	    }
-
-//	    @GetMapping("/")
-//	    public String listUploadedFiles(Model model) throws IOException {
-//
-//	        model.addAttribute("files", storageService
-//	                .loadAll()
-//	                .map(path ->
-//	                        MvcUriComponentsBuilder
-//	                                .fromMethodName(FileUploadController.class, "serveFile", path.getFileName().toString())
-//	                                .build().toString())
-//	                .collect(Collectors.toList()));
-//
-//	        return "uploadForm";
-//	    }
-
-//	    @GetMapping("/files/{filename:.+}")
-//	    @ResponseBody
-//	    public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
-//
-//	        Resource file = storageService.loadAsResource(filename);
-//	        return ResponseEntity
-//	                .ok()
-//	                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""+file.getFilename()+"\"")
-//	                .body(file);
-//	    }
 
 	    @PostMapping("/ocr")	    
 	    public  @ResponseBody String handleFileUpload(@RequestParam("file") MultipartFile file) throws IOException, TesseractException {
-
-	        //storageService.store(file);
-//	        redirectAttributes.addFlashAttribute("message",
-//	                "You successfully uploaded " + file.getOriginalFilename() + "!");
 	    	InputStream imageStream = file.getInputStream();
 	    	ITesseract instance = new Tesseract();  // JNA Interface Mapping
-//	    	instance.setLanguage("swe");
-			instance.setDatapath("/usr/share/tesseract-ocr/tessdata");	    	
+	    	String tessdataPath = System.getProperty("tessdata");
+	    	String tesslang = System.getProperty("tesslang");
+	    	instance.setLanguage(tesslang);	    	
+	    	instance.setDatapath(tessdataPath);
 	    	BufferedImage imBuff = ImageIO.read(imageStream);
 	    	String content = instance.doOCR(imBuff);
 	        
-
 	        return content;
-//	        return ResponseEntity
-//	                .ok()
-//	                .header(HttpHeaders.CONTENT_DISPOSITION, "pic content=\""+ content +"\"")
-//	                .body(content);
 	    }
-
-//	    @ExceptionHandler(StorageFileNotFoundException.class)
-//	    public ResponseEntity handleStorageFileNotFound(StorageFileNotFoundException exc) {
-//	        return ResponseEntity.notFound().build();
-//	    }
-
 }
